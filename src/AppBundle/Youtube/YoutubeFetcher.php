@@ -21,7 +21,7 @@ class YoutubeFetcher
 
     public function fetchThumbnail($videoId)
     {
-        if($this->logger !== null && !isset($toto)) {
+        if ($this->logger !== null && !isset($toto)) {
             $this->logger->info('A youtube thumbnail has been requested.');
         }
 

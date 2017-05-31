@@ -24,7 +24,13 @@ Debug::enable();
 
 $kernel = new AppKernel('dev', true);
 $kernel->loadClassCache();
+
+//$kernel = new AppCache($kernel);
+
 $request = Request::createFromGlobals();
+$request->headers->set('Surrogate-Capability', 'ESI/1.0');
 $response = $kernel->handle($request);
+file_put_contents('/tmp/amod.out', $response->getContent().'#########################', FILE_APPEND);
+
 $response->send();
 $kernel->terminate($request, $response);

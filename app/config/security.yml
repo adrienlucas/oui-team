@@ -2,23 +2,34 @@
 # http://symfony.com/doc/current/security.html
 security:
 
-    # http://symfony.com/doc/current/security.html#b-configuring-how-users-are-loaded
-    providers:
-        in_memory:
-            memory: ~
+    encoders:
+       Symfony\Component\Security\Core\User\User: plaintext
 
+    providers:
+        my_users:
+            memory:
+               users:
+                  adrien:
+                      password: adrien
+                      roles: ['ROLE_ADMIN']
+                  foo:
+                      password: bar
+                      roles: ['ROLE_USER']
     firewalls:
-        # disables authentication for assets and the profiler, adapt it according to your needs
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
         main:
             anonymous: ~
+            provider: my_users
             # activate different ways to authenticate
 
             # http://symfony.com/doc/current/security.html#a-configuring-how-your-users-will-authenticate
-            #http_basic: ~
+            http_basic: ~
 
             # http://symfony.com/doc/current/cookbook/security/form_login_setup.html
             #form_login: ~
+
+    access_control:
+        - {path: '^/admin', roles: ['ROLE_ADMIN']}
