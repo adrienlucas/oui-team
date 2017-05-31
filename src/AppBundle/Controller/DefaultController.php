@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -17,9 +18,8 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $request->getLocale()
-            $this->get('translator')->trans('toto');
-        // dump($this->get('app.youtube_fetcher')->fetchThumbnail('aaaa'));
+
+        dump($this->get('app.youtube_fetcher')->fetchThumbnail('aaaa'));
         // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
             'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
@@ -31,8 +31,15 @@ class DefaultController extends Controller
      */
     public function adminAction()
     {
-        $this->get()
         return new Response('You are the Administrator of the application.');
+    }
+
+    /**
+     * @Route("/words", name="words")
+     */
+    public function wordsAction()
+    {
+        return new JsonResponse($this->get('app.wordlist')->getWords());
     }
 
     /**
@@ -48,9 +55,6 @@ class DefaultController extends Controller
      */
     public function showYoutubeThumbnailAction(Request $request)
     {
-        $response = new Response('Hello world !');
-        $response->setExpires(new \DateTime('+600'));
-        return $response;
         if (!$request->query->has('videoId')) {
             throw new BadRequestHttpException('You should provide a videoId.');
         }
@@ -62,4 +66,6 @@ class DefaultController extends Controller
             'thumbnail' => $thumbnail,
         ]);
     }
+
+
 }

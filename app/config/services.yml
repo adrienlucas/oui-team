@@ -20,7 +20,32 @@ services:
       - [setLogger, ['@logger']]
 
   app.youtube_fetcher:
-    alias: app.youtube_fetcher_without_logger
+    alias: app.youtube_fetcher_with_logger
     #service_name:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
+
+
+  app.youtube.twig_extension:
+      class: AppBundle\Youtube\TwigExtension
+      arguments: ['@app.youtube_fetcher']
+      tags:
+          - { name: twig.extension }
+
+  app.json_loader:
+      class: AppBundle\WordList\JsonWordsLoader
+      tags:
+          - {name: app.words_loader, type: json }
+
+  app.txt_loader:
+      class: AppBundle\WordList\TxtWordsLoader
+      tags:
+          - {name: app.words_loader, type: txt }
+
+  app.wordlist:
+      class: AppBundle\WordList\WordList
+      calls:
+          - [addWordsByFile, ['%kernel.root_dir%/Resources/words.txt']]
+          - [addWordsByFile, ['%kernel.root_dir%/Resources/words.json']]
+#          - [addLoader, ['@app.json_loader', 'json']]
+#          - [addLoader, ['@app.txt_loader', 'txt']]

@@ -3,6 +3,7 @@
 namespace Tests\AppBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 
 class DefaultControllerTest extends WebTestCase
 {
@@ -19,10 +20,11 @@ class DefaultControllerTest extends WebTestCase
     public function testShowYoutubeThumbnail()
     {
         $client = static::createClient();
+        $client->enableProfiler();
+
         $videoId = 'aaaa';
-        //$url = $client->getContainer()->get('router')->generate('show_youtube_thumbnail', ['videoId' => $videoId]);
+
         $url = sprintf('/show-youtube-thumbnail?videoId=%s', $videoId);
-        dump($url);
         $crawler = $client->request('GET', $url);
 
         static::assertEquals(200, $client->getResponse()->getStatusCode());
@@ -31,5 +33,16 @@ class DefaultControllerTest extends WebTestCase
 
         static::assertRegExp('/^https/', $actualThumbnailLink);
         static::assertContains($videoId, $actualThumbnailLink);
+
+        /** @var LoggerDataCollector $logsCollector */
+        $logsCollector = $client->getProfile()->getCollector('logger');
+        $actualLogCount = 0;
+        foreach($logsCollector->getLogs() as $log) {
+            if($log['message'] === 'A youtube thumbnail has been requested.') {
+                $actualLogCount++;
+            }
+        }
+
+        static::assertSame(1, $actualLogCount, 'The log message was not found.');
     }
 }
