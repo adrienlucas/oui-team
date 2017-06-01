@@ -2,13 +2,18 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Dummy\DummyFormType;
+use AppBundle\Dummy\DummyModel;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DefaultController extends Controller
 {
@@ -27,19 +32,28 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/admin", name="admin")
+     * @Route("/form")
      */
-    public function adminAction()
+    public function formAction(Request $request)
     {
-        return new Response('You are the Administrator of the application.');
+        $model = new DummyModel("foobar");
+        $form  = $this->createForm(DummyFormType::class, $model, [
+            'show_the_super_field' => ($this->getUser() !== null && $this->getUser()->getUsername() === 'adrien')
+        ]);
+
+        $form->handleRequest($request);
+
+        return $this->render('default/form.html.twig', [
+            'formView' => $form->createView()
+        ]);
     }
 
     /**
-     * @Route("/words", name="words")
+     * @Route("/words/", name="words")
      */
     public function wordsAction()
     {
-        return new JsonResponse($this->get('app.wordlist')->getWords());
+        $response = new JsonResponse($this->get('app.wordlist')->getWords());
     }
 
     /**
@@ -47,7 +61,7 @@ class DefaultController extends Controller
      */
     public function highFrequencyReloadingAction()
     {
-        return $this->render('default/high_frequency_reloading.html.Twig');
+        return $this->render('default/high_frequency_reloading.html.Twig', []);
     }
 
     /**

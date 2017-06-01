@@ -18,9 +18,12 @@ class WordsLoaderCompilePass implements CompilerPassInterface
         if(!$container->hasDefinition('app.wordlist')) {
             return;
         }
+
+
         $wordlistServiceDefinition = $container->getDefinition('app.wordlist');
 
         $loaders = $container->findTaggedServiceIds('app.words_loader');
+
         foreach($loaders as $serviceId => $tagAttributes) {
             $wordlistServiceDefinition->addMethodCall(
                 'addLoader', [new Reference($serviceId), $tagAttributes[0]['type']]
